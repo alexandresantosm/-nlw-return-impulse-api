@@ -7,6 +7,8 @@ interface SubmitFeedbackUseCaseRequest {
   screenshot?: string;
 }
 
+const INITIAL_STRING_SCREENSHOT = 'data:image/png;base64';
+
 export class SubmitFeedbackUseCase {
   constructor(
     private readonly feedbacksRepository: FeedbacksRepository,
@@ -15,6 +17,18 @@ export class SubmitFeedbackUseCase {
 
   async execute(request: SubmitFeedbackUseCaseRequest) {
     const { type, comment, screenshot } =  request;
+
+    if (!type) {
+      throw new Error('Type is required.');
+    }
+
+    if (!comment) {
+      throw new Error('Comment is required.');
+    }
+
+    if (screenshot && !screenshot.startsWith(INITIAL_STRING_SCREENSHOT)) {
+      throw new Error('Invalid screenshot format.');
+    }
 
     await this.feedbacksRepository.create({
       type,
